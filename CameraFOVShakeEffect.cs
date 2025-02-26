@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
-using AbstractDefence.Utilities;
+using SimpleEffects.Utilities;
 using UnityEngine;
 
-namespace AbstractDefence.Effects
+namespace SimpleEffects
 {
     public class CameraFOVShakeEffect : Effect
     {

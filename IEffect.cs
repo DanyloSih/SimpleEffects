@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace AbstractDefence.Effects
+namespace SimpleEffects
 {
     public enum EndCause
     {
