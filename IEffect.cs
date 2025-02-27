@@ -2,9 +2,10 @@
 
 namespace SimpleEffects
 {
+
     public enum EndCause
     {
-        Finished,
+        Completed,
         Stopped
     }
 
@@ -13,8 +14,10 @@ namespace SimpleEffects
     public interface IEffect
     {
         public bool IsPlaying { get; }
+        public IEffectEvents Events { get; }
+        public float PlaybackSpeed { get; set; }
 
-        public void Start(MonoBehaviour coroutineExecuter, float effectForce = 1, EffectEndCallback effectEndCallback = null);
+        public void Play(MonoBehaviour coroutineExecuter);
 
         public void Stop();
     }

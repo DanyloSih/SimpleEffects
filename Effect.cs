@@ -1,53 +1,63 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace SimpleEffects
 {
     public abstract class Effect : IEffect
     {
+        [Serializable]
+        public class Config
+        {
+            public float PlaybackSpeed = 1f;
+        }
+
         private Coroutine _coroutine;
+        private EffectEvents _effectEvents = new EffectEvents();
+        private Config _config;
 
-        public bool IsPlaying { get; private set; }
+        protected Effect(Config config)
+        {
+            _config = config;
+        }
 
-        protected EffectEndCallback EffectEndCallback { get; private set; }
+        public float PlaybackSpeed
+        {
+            get => _config.PlaybackSpeed;
+            set => _config.PlaybackSpeed = value;
+        }
+        public bool IsPlaying { get => _coroutine != null; }   
+        public IEffectEvents Events { get => _effectEvents; }
+
         protected MonoBehaviour CoroutineExecutor { get; private set; }
 
-        public void Start(MonoBehaviour coroutineExecuter, float effectForce = 1, EffectEndCallback effectEndCallback = null)
+        public void Play(MonoBehaviour coroutineExecuter)
         {
-            TryStopCoroutine();
-
+            Stop();
             CoroutineExecutor = coroutineExecuter;
-            EffectEndCallback = effectEndCallback;
-            IsPlaying = true;
-            _coroutine = coroutineExecuter.StartCoroutine(Process(effectForce));
+            _coroutine = coroutineExecuter.StartCoroutine(Process());
         }
 
         public void Stop()
         {
-            TryStopCoroutine();          
-            IsPlaying = false;
-        }
-
-        protected void TryStopCoroutine()
-        {
-            if (_coroutine != null)
-            {
+            if (IsPlaying)
+            {            
                 CoroutineExecutor?.StopCoroutine(_coroutine);
-                _coroutine = null;
                 OnStop();
-                EffectEndCallback?.Invoke(EndCause.Stopped);
+                _coroutine = null;
+                _effectEvents.Stop();
             }
         }
 
-        protected abstract IEnumerator OnStart(float effectForce = 1);
+        protected abstract IEnumerator OnPlay();
+
+        private IEnumerator Process()
+        {
+            yield return OnPlay();
+            _coroutine = null;
+            _effectEvents.Complete();
+        }
 
         protected virtual void OnStop() { }
-
-        private IEnumerator Process(float effectForce = 1)
-        {
-            yield return OnStart(effectForce);
-            EffectEndCallback?.Invoke(EndCause.Finished);
-            IsPlaying = false;
-        }
     }
 }
