@@ -21,6 +21,11 @@ namespace SimpleEffects
             _config = config;
         }
 
+        protected Effect(float playbackSpeed)
+        {
+            _config = new Config() { PlaybackSpeed = playbackSpeed };
+        }
+
         public float PlaybackSpeed
         {
             get => _config.PlaybackSpeed;
